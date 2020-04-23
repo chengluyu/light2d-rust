@@ -4,4 +4,4 @@ This project is an implementation of [Milo Yip's light2d](https://github.com/mil
 
 ## Basic
 
-![basic](output/basic.png)
+![basic](./output/basic.png)
