@@ -16,9 +16,11 @@ light2d-rust [--output <output image>] <command> [<args>]
 The `<command>` can be one of the following case names.
 
 * **basic** The basic example.
+* **csg** The constructive solid geometry example.
 
 ## Gallery
 
 <p>
   <img src="https://github.com/chengluyu/light2d-rust/blob/master/output/basic.png?raw=true" width="200" />
+  <img src="https://github.com/chengluyu/light2d-rust/blob/master/output/csg.png?raw=true" width="200" />
 </p>

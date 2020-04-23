@@ -3,6 +3,8 @@ extern crate clap;
 extern crate png;
 extern crate rand;
 
+mod csg;
+
 use rand::prelude::*;
 use std::f32;
 use std::fs::File;
@@ -68,6 +70,32 @@ fn basic(path: &Path) {
     writer.write_image_data(data.as_slice()).unwrap();
 }
 
+fn csg(path: &Path) {
+    use crate::csg::sample;
+
+    let mut rng = rand::thread_rng();
+    let data = (0..HEIGHT)
+        .flat_map(|y| {
+            (0..WIDTH).map(move |x| {
+                (255.0
+                    * sample(
+                        (x as f32) / (WIDTH as f32),
+                        (y as f32) / (HEIGHT as f32),
+                        &mut rng,
+                    )
+                    .min(1.0)) as u8
+            })
+        })
+        .collect::<Vec<u8>>();
+    let file = File::create(path).unwrap();
+    let ref mut w = BufWriter::new(file);
+    let mut encoder = png::Encoder::new(w, WIDTH as u32, HEIGHT as u32);
+    encoder.set_color(png::ColorType::Grayscale);
+    encoder.set_depth(png::BitDepth::Eight);
+    let mut writer = encoder.write_header().unwrap();
+    writer.write_image_data(data.as_slice()).unwrap();
+}
+
 fn main() {
     let matches = clap_app!(light2d =>
         (version: "1.0.0")
@@ -75,6 +103,9 @@ fn main() {
         (@arg output: -o --output +takes_value "Specify the path of the output image")
         (@subcommand basic =>
             (about: "Run basic light simulation")
+        )
+        (@subcommand csg =>
+            (about: "Constructive solid geometry")
         )
     )
     .get_matches();
@@ -87,6 +118,7 @@ fn main() {
             .unwrap_or(default_path.as_path());
         match subcommand {
             "basic" => basic(&path),
+            "csg" => csg(&path),
             _ => println!("Unknown command: {}", subcommand),
         }
     } else {
