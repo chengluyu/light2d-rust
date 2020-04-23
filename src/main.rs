@@ -1,3 +1,5 @@
+#[macro_use]
+extern crate clap;
 extern crate png;
 extern crate rand;
 
@@ -42,9 +44,8 @@ fn sample(x: f32, y: f32, rng: &mut rand::rngs::ThreadRng) -> f32 {
         / (N as f32)
 }
 
-fn main() {
+fn basic(path: &Path) {
     let mut rng = rand::thread_rng();
-
     let data = (0..HEIGHT)
         .flat_map(|y| {
             (0..WIDTH).map(move |x| {
@@ -58,8 +59,6 @@ fn main() {
             })
         })
         .collect::<Vec<u8>>();
-
-    let path = Path::new("basic.png");
     let file = File::create(path).unwrap();
     let ref mut w = BufWriter::new(file);
     let mut encoder = png::Encoder::new(w, WIDTH as u32, HEIGHT as u32);
@@ -67,4 +66,30 @@ fn main() {
     encoder.set_depth(png::BitDepth::Eight);
     let mut writer = encoder.write_header().unwrap();
     writer.write_image_data(data.as_slice()).unwrap();
+}
+
+fn main() {
+    let matches = clap_app!(light2d =>
+        (version: "1.0.0")
+        (about: "Milo Yip's light2d in Rust")
+        (@arg output: -o --output +takes_value "Specify the path of the output image")
+        (@subcommand basic =>
+            (about: "Run basic light simulation")
+        )
+    )
+    .get_matches();
+
+    if let Some(subcommand) = matches.subcommand_name() {
+        let default_path = Path::new("output").join(format!("{}.png", subcommand));
+        let path = matches
+            .value_of("output")
+            .map(Path::new)
+            .unwrap_or(default_path.as_path());
+        match subcommand {
+            "basic" => basic(&path),
+            _ => println!("Unknown command: {}", subcommand),
+        }
+    } else {
+        println!("Please supply a command");
+    }
 }
