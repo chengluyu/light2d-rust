@@ -1,13 +1,13 @@
 use crate::*;
 
 #[derive(Clone, Copy)]
-struct SceneResult {
-    sd: f32,
-    emissive: f32,
+pub struct SceneResult {
+    pub sd: f32,
+    pub emissive: f32,
 }
 
 impl SceneResult {
-    fn union(&self, shape: &SceneResult) -> SceneResult {
+    pub fn union(&self, shape: &SceneResult) -> SceneResult {
         if self.sd < shape.sd {
             self.clone()
         } else {
@@ -15,21 +15,33 @@ impl SceneResult {
         }
     }
 
-    fn intersect(&self, shape: &SceneResult) -> SceneResult {
+    pub fn intersect(&self, shape: &SceneResult) -> SceneResult {
         SceneResult {
-            sd: if self.sd > shape.sd { self.sd } else { shape.sd },
-            emissive: if self.sd > shape.sd { shape.emissive } else { self.emissive },
+            sd: if self.sd > shape.sd {
+                self.sd
+            } else {
+                shape.sd
+            },
+            emissive: if self.sd > shape.sd {
+                shape.emissive
+            } else {
+                self.emissive
+            },
         }
     }
 
-    fn subtract(&self, shape: &SceneResult) -> SceneResult {
+    pub fn subtract(&self, shape: &SceneResult) -> SceneResult {
         SceneResult {
-            sd: if self.sd > -shape.sd { self.sd } else { -shape.sd },
+            sd: if self.sd > -shape.sd {
+                self.sd
+            } else {
+                -shape.sd
+            },
             emissive: self.emissive,
         }
     }
 
-    fn complement(&self) -> SceneResult {
+    pub fn complement(&self) -> SceneResult {
         SceneResult {
             sd: -self.sd,
             emissive: self.emissive,
@@ -39,11 +51,11 @@ impl SceneResult {
 
 fn scene(x: f32, y: f32) -> SceneResult {
     let a = SceneResult {
-        sd: circle_sdf(x, y, 0.4, 0.5, 0.2),
+        sd: sdf::circle(x, y, 0.4, 0.5, 0.2),
         emissive: 1.0,
     };
     let b = SceneResult {
-        sd: circle_sdf(x, y, 0.6, 0.5, 0.2),
+        sd: sdf::circle(x, y, 0.6, 0.5, 0.2),
         emissive: 0.8,
     };
     a.union(&b)
