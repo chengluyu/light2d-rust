@@ -19,6 +19,7 @@ The `<command>` can be one of the following case names.
 * **csg** The constructive solid geometry example.
 * **shapes** Example of many shapes.
 * **scene** A simple scene implementation.
+* **reflection** A simple reflection example.
 
 ## Gallery
 
@@ -27,4 +28,5 @@ The `<command>` can be one of the following case names.
   <img src="https://github.com/chengluyu/light2d-rust/blob/master/output/csg.png?raw=true" width="20%" />
   <img src="https://github.com/chengluyu/light2d-rust/blob/master/output/shapes.png?raw=true" width="20%" />
   <img src="https://github.com/chengluyu/light2d-rust/blob/master/output/scene.png?raw=true" width="20%" />
+  <img src="https://github.com/chengluyu/light2d-rust/blob/master/output/reflection.png?raw=true" width="20%" />
 </p>
