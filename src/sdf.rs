@@ -29,7 +29,7 @@ pub fn rectangle(x: f32, y: f32, cx: f32, cy: f32, theta: f32, sx: f32, sy: f32)
     let cos_theta = theta.cos();
     let sin_theta = theta.sin();
     let dx = ((x - cx) * cos_theta + (y - cy) * sin_theta).abs() - sx;
-    let dy = ((y - cy) * cos_theta + (x - cx) * sin_theta).abs() - sy;
+    let dy = ((y - cy) * cos_theta - (x - cx) * sin_theta).abs() - sy;
     let ax = dx.max(0.0);
     let ay = dy.max(0.0);
     dx.max(dy).min(0.0) + (ax * ax + ay * ay).sqrt()
