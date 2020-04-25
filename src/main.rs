@@ -4,6 +4,7 @@ extern crate png;
 extern crate rand;
 
 mod csg;
+mod scene;
 mod sdf;
 mod shapes;
 
@@ -118,6 +119,50 @@ fn shapes(path: &Path) {
     writer.write_image_data(data.as_slice()).unwrap();
 }
 
+fn scene(path: &Path) {
+    use crate::scene::*;
+
+    let config = SceneConfig {
+        width: WIDTH * 2,
+        height: HEIGHT * 2,
+    };
+    let scene = Scene(
+        (0..10)
+            .map(|i| (i as f32) / 10.0)
+            .map(|x| (x, x * f32::consts::PI * 2.0))
+            .map(|(emissive, angle)| {
+                Object::Shape(
+                    Shape::Circle {
+                        cx: 0.5 + angle.cos() * 0.4,
+                        cy: 0.5 + angle.sin() * 0.4,
+                        r: 0.05,
+                    },
+                    emissive,
+                )
+            })
+            .fold(
+                Object::Shape(
+                    Shape::Circle {
+                        cx: 0.5,
+                        cy: 0.5,
+                        r: 0.1,
+                    },
+                    1.0,
+                ),
+                |left, right| Object::Union(Box::new(left), Box::new(right)),
+            ),
+    );
+    let data = scene.render(&config);
+
+    let file = File::create(path).unwrap();
+    let ref mut w = BufWriter::new(file);
+    let mut encoder = png::Encoder::new(w, config.width as u32, config.height as u32);
+    encoder.set_color(png::ColorType::Grayscale);
+    encoder.set_depth(png::BitDepth::Eight);
+    let mut writer = encoder.write_header().unwrap();
+    writer.write_image_data(data.as_slice()).unwrap();
+}
+
 fn main() {
     let matches = clap_app!(light2d =>
         (version: "1.0.0")
@@ -132,6 +177,9 @@ fn main() {
         (@subcommand shapes =>
             (about: "Different shapes")
         )
+        (@subcommand scene =>
+            (about: "Scene API")
+        )
     )
     .get_matches();
 
@@ -145,6 +193,7 @@ fn main() {
             "basic" => basic(&path),
             "csg" => csg(&path),
             "shapes" => shapes(&path),
+            "scene" => scene(&path),
             _ => println!("Unknown command: {}", subcommand),
         }
     } else {
